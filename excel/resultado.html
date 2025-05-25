@@ -1,0 +1,264 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Análisis de Sensores de Temperatura</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Source+Code+Pro&display=swap');
+
+            body {
+                font-family: 'Roboto', Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f8f9fa; /* Un gris muy claro */
+                color: #343a40; /* Gris oscuro para texto */
+                line-height: 1.7;
+            }
+
+            .container {
+                max-width: 960px;
+                margin: 40px auto;
+                background-color: #ffffff; /* Fondo blanco para el contenido */
+                padding: 40px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                color: #0056b3; /* Un azul más vibrante */
+                margin-top: 1.5em;
+                margin-bottom: 0.8em;
+                border-bottom: 2px solid #e9ecef; /* Línea sutil bajo los títulos */
+                padding-bottom: 0.3em;
+            }
+
+            h1 {
+                font-size: 2.5em;
+                border-bottom-width: 3px;
+            }
+
+            h2 {
+                font-size: 2em;
+            }
+
+            h3 {
+                font-size: 1.5em;
+            }
+
+            p {
+                margin-bottom: 1.2em;
+            }
+
+            a {
+                color: #007bff; /* Azul estándar para enlaces */
+                text-decoration: none;
+            }
+
+            a:hover {
+                color: #0056b3;
+                text-decoration: underline;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 25px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                border-radius: 5px;
+                overflow: hidden; /* Para que el border-radius afecte a th/td */
+                border: 1px solid #dee2e6; /* Borde sutil general */
+            }
+
+            th, td {
+                padding: 12px 15px;
+                text-align: left;
+                border-bottom: 1px solid #dee2e6; /* Líneas horizontales */
+            }
+
+            th {
+                background-color: #e9ecef; /* Fondo gris claro para cabeceras */
+                color: #495057; /* Texto más oscuro para cabeceras */
+                font-weight: 700;
+                text-transform: uppercase;
+                font-size: 0.85em;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f8f9fa; /* Filas alternas con color sutil */
+            }
+
+            tr:hover {
+                background-color: #e2e6ea; /* Efecto hover */
+            }
+
+            code {
+                font-family: 'Source Code Pro', monospace;
+                background-color: #e9ecef;
+                padding: 0.2em 0.4em;
+                margin: 0;
+                font-size: 85%;
+                border-radius: 3px;
+                color: #c7254e; /* Color para código inline */
+            }
+
+            pre {
+                background: #282c34; /* Fondo oscuro para bloques de código */
+                color: #abb2bf; /* Texto claro */
+                padding: 20px;
+                display: block;
+                overflow-x: auto;
+                border-radius: 6px;
+                font-family: 'Source Code Pro', monospace;
+                font-size: 0.9em;
+                margin-bottom: 20px;
+                border: 1px solid #212529;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            pre code {
+                padding: 0;
+                font-size: inherit;
+                color: inherit;
+                background: none;
+            }
+
+            blockquote {
+                border-left: 5px solid #007bff;
+                background-color: #f8f9fa;
+                padding: 15px 20px;
+                margin: 20px 0;
+                font-style: italic;
+                color: #6c757d; /* Gris para citas */
+            }
+
+            strong {
+                color: #212529; /* Casi negro para énfasis fuerte */
+                font-weight: 700;
+            }
+
+            em {
+                color: #495057; /* Gris oscuro para énfasis */
+                font-style: italic;
+            }
+
+            hr {
+                border: none;
+                border-top: 1px solid #dee2e6; /* Línea divisoria más sutil */
+                margin: 40px 0;
+            }
+
+            ul, ol {
+                margin-bottom: 1.2em;
+                padding-left: 20px;
+            }
+
+            li {
+                margin-bottom: 0.5em;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Análisis de Sensores de Temperatura</h1>
+            <h3><strong>Reporte de Análisis Estadístico de Lecturas de Temperatura</strong></h3>
+<h4><strong>1. Resumen General</strong></h4>
+<ul>
+<li><strong>Total de lecturas analizadas:</strong> 5</li>
+<li><strong>Rango de fechas:</strong> Única fecha registrada (2025-05-25), con lecturas entre las 08:00 y 08:20.</li>
+</ul>
+<h4><strong>2. Estadísticas Descriptivas</strong></h4>
+<table>
+<thead>
+<tr>
+<th><strong>Métrica</strong></th>
+<th><strong>Valor (°C)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Temperatura Promedio</td>
+<td>22.14</td>
+</tr>
+<tr>
+<td>Temperatura Máxima</td>
+<td>24.1 (Sala B)</td>
+</tr>
+<tr>
+<td>Temperatura Mínima</td>
+<td>19.8 (Laboratorio)</td>
+</tr>
+<tr>
+<td>Rango (Max - Min)</td>
+<td>4.3</td>
+</tr>
+</tbody>
+</table>
+<h4><strong>3. Desviación Estándar</strong></h4>
+<ul>
+<li><strong>Desviación estándar:</strong> ≈1.58 °C<br />
+<em>Indica una dispersión moderada de los datos alrededor del promedio.</em></li>
+</ul>
+<h4><strong>4. Alertas Registradas</strong></h4>
+<ul>
+<li><strong>Total de alertas:</strong> 1  </li>
+<li><strong>Detalle:</strong> Laboratorio (19.8°C) marcado como "Alerta".  </li>
+<li><strong>Posible causa:</strong> Temperatura inferior al umbral aceptable (ej. &lt;20°C en entornos críticos).</li>
+</ul>
+<h4><strong>5. Distribución por Ubicación</strong></h4>
+<table>
+<thead>
+<tr>
+<th><strong>Ubicación</strong></th>
+<th><strong>Temperatura (°C)</strong></th>
+<th><strong>Estado</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sala A</td>
+<td>22.5</td>
+<td>Normal</td>
+</tr>
+<tr>
+<td>Sala B</td>
+<td>24.1</td>
+<td>Normal</td>
+</tr>
+<tr>
+<td>Laboratorio</td>
+<td>19.8</td>
+<td>Alerta</td>
+</tr>
+<tr>
+<td>Almacén</td>
+<td>21.3</td>
+<td>Normal</td>
+</tr>
+<tr>
+<td>Oficina Central</td>
+<td>23.0</td>
+<td>Normal</td>
+</tr>
+</tbody>
+</table>
+<h4><strong>6. Hallazgos Relevantes</strong></h4>
+<ol>
+<li><strong>Variabilidad:</strong> La temperatura en Sala B (24.1°C) fue significativamente mayor que en el Laboratorio (19.8°C), sugiriendo posibles diferencias en sistemas de climatización o fuentes de calor.</li>
+<li><strong>Alertas:</strong> Solo el Laboratorio registró una alerta, lo que podría indicar un fallo localizado o un ajuste incorrecto de los umbrales de temperatura.</li>
+<li><strong>Consistencia:</strong> 4 de 5 lecturas (80%) estuvieron en rango "Normal", con temperaturas entre 21.3°C y 24.1°C.</li>
+</ol>
+<h4><strong>7. Recomendaciones</strong></h4>
+<ul>
+<li><strong>Investigar causa de alerta en Laboratorio:</strong> Verificar sensores y comparar con estándares del área.</li>
+<li><strong>Monitorear Sala B:</strong> Temperatura relativamente alta (24.1°C) podría requerir ajuste de HVAC.</li>
+<li><strong>Ampliar muestra temporal:</strong> Analizar más lecturas para identificar patrones (ej.: fluctuaciones diarias).</li>
+</ul>
+<hr />
+<p><strong>Nota:</strong> Si se dispone de umbrales específicos de "Normal/Alerta", el análisis podría profundizarse en términos de cumplimiento de protocolos.</p>
+        </div>
+    </body>
+    </html>
+    
