@@ -1,7 +1,6 @@
-# Reporte de practicas realizadas en el curso
+# Reporte de practicas realizadas en el repositorio
 
-## Manipulacion de excel
-En esta parte del curso utilize la libreria de manipulacion del excel
-```py
-pip install openpyxl
-```
+## Práctica 1: Excel y DeepSeek para analizar datos 🧪📈
+
+### 📄 Ver Reporte
+👉 [Ver reporte de la práctica](excel/report.md)
