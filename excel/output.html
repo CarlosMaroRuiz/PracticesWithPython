@@ -1,0 +1,538 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Análisis de Sensores de Temperatura</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+        <script>
+            // Registrar el plugin de datalabels
+            Chart.register(ChartDataLabels);
+            
+            // Configuración global de Chart.js
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.font.size = 14;
+            Chart.defaults.color = '#2c3e50';
+            Chart.defaults.responsive = true;
+            Chart.defaults.maintainAspectRatio = false;
+            
+            // Cola de inicialización de gráficas
+            window.chartInitQueue = window.chartInitQueue || [];
+            
+            // Función para inicializar todas las gráficas
+            function initializeCharts() {
+                // Ajustar el tamaño de los canvas
+                const canvases = document.querySelectorAll('canvas');
+                canvases.forEach(canvas => {
+                    const container = canvas.parentElement;
+                    if (container) {
+                        canvas.style.maxWidth = '100%';
+                        canvas.style.height = 'auto';
+                        // Asegurar que el canvas tenga un tamaño mínimo
+                        if (!canvas.style.height) {
+                            canvas.style.height = '400px';
+                        }
+                    }
+                });
+                
+                // Ejecutar todas las funciones de inicialización en la cola
+                if (window.chartInitQueue && window.chartInitQueue.length > 0) {
+                    window.chartInitQueue.forEach(initFn => {
+                        try {
+                            initFn();
+                        } catch (error) {
+                            console.error('Error al ejecutar función de inicialización:', error);
+                        }
+                    });
+                    // Limpiar la cola después de ejecutar
+                    window.chartInitQueue = [];
+                }
+            }
+            
+            // Función para verificar si el DOM está listo
+            function domReady(fn) {
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', fn);
+                } else {
+                    fn();
+                }
+            }
+            
+            // Inicializar gráficas cuando el DOM esté listo
+            domReady(initializeCharts);
+            
+            // También intentar inicializar después de un breve retraso por si acaso
+            setTimeout(initializeCharts, 100);
+        </script>
+       <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap');
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                margin: 0;
+                padding: 0;
+                background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                min-height: 100vh;
+                color: #2c3e50;
+                line-height: 1.6;
+            }
+
+            .container {
+                max-width: 1200px;
+                margin: 40px auto;
+                background: rgba(255, 255, 255, 0.95);
+                padding: 60px;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                backdrop-filter: blur(10px);
+            }
+
+            /* Estilos para gráficas */
+            .chart-container {
+                position: relative;
+                margin: 40px 0;
+                padding: 30px;
+                background: linear-gradient(145deg, #ffffff, #f0f0f0);
+                border-radius: 15px;
+                box-shadow: 
+                    0 8px 16px rgba(0,0,0,0.1),
+                    inset 0 1px 3px rgba(255,255,255,0.8);
+                transition: all 0.3s ease;
+            }
+
+            .chart-container:hover {
+                transform: translateY(-5px);
+                box-shadow: 
+                    0 12px 24px rgba(0,0,0,0.15),
+                    inset 0 1px 3px rgba(255,255,255,0.8);
+            }
+
+            canvas {
+                max-width: 100%;
+                height: auto !important;
+                max-height: 450px;
+            }
+
+            /* Títulos y encabezados */
+            h1, h2, h3, h4, h5, h6 {
+                color: #2c3e50;
+                margin-top: 2em;
+                margin-bottom: 1em;
+                font-weight: 600;
+                position: relative;
+                padding-bottom: 0.5em;
+            }
+
+            h1 {
+                font-size: 2.8em;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-align: center;
+                margin-bottom: 1.5em;
+            }
+
+            h2::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 60px;
+                height: 3px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border-radius: 2px;
+            }
+
+            /* Tablas mejoradas */
+            table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin: 30px 0;
+                background: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+            }
+
+            th, td {
+                padding: 15px 20px;
+                text-align: left;
+            }
+
+            th {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                font-weight: 600;
+                text-transform: uppercase;
+                font-size: 0.85em;
+                letter-spacing: 0.5px;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f8f9fa;
+            }
+
+            tr:hover {
+                background-color: #e9ecef;
+                transition: background-color 0.2s;
+            }
+
+            /* Código */
+            code {
+                font-family: 'JetBrains Mono', monospace;
+                background: linear-gradient(135deg, #f5f2f0 0%, #e9e6e4 100%);
+                padding: 0.2em 0.4em;
+                border-radius: 4px;
+                color: #e53e3e;
+                font-size: 0.9em;
+            }
+
+            pre {
+                background: #282c34;
+                color: #abb2bf;
+                padding: 25px;
+                border-radius: 10px;
+                font-family: 'JetBrains Mono', monospace;
+                margin: 20px 0;
+                overflow-x: auto;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            /* Alertas y destacados */
+            .alert {
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 10px;
+                border-left: 5px solid;
+            }
+
+            .alert-warning {
+                background-color: #fff3cd;
+                border-color: #ffc107;
+                color: #856404;
+            }
+
+            .alert-danger {
+                background-color: #f8d7da;
+                border-color: #dc3545;
+                color: #721c24;
+            }
+
+            .alert-success {
+                background-color: #d4edda;
+                border-color: #28a745;
+                color: #155724;
+            }
+
+            /* Estadísticas */
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                margin: 30px 0;
+            }
+
+            .stat-card {
+                background: linear-gradient(145deg, #ffffff, #f0f0f0);
+                padding: 25px;
+                border-radius: 15px;
+                text-align: center;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                transition: all 0.3s ease;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            }
+
+            .stat-value {
+                font-size: 2.5em;
+                font-weight: 700;
+                color: #667eea;
+                margin: 10px 0;
+            }
+
+            .stat-label {
+                font-size: 0.9em;
+                color: #6c757d;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .container {
+                    padding: 30px;
+                    margin: 20px;
+                }
+                
+                h1 {
+                    font-size: 2em;
+                }
+                
+                .stats-grid {
+                    grid-template-columns: 1fr;
+                }
+                
+                table {
+                    font-size: 0.9em;
+                }
+                
+                th, td {
+                    padding: 10px;
+                }
+            }
+
+            /* Animaciones */
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .chart-container, .stat-card, table {
+                animation: fadeIn 0.6s ease-out;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Reporte de Análisis de Temperatura</h1>
+<h2>1. Resumen Ejecutivo</h2>
+<p>El análisis de las lecturas de temperatura muestra un rango de 19.8°C a 24.1°C en las diferentes ubicaciones monitoreadas. La temperatura promedio general es de 22.14°C, con una desviación estándar de 1.56°C, indicando una variabilidad moderada entre las ubicaciones.</p>
+<p>Se detectó una alerta en el Laboratorio con una temperatura de 19.8°C, que es significativamente más baja que las demás lecturas. Las demás ubicaciones mantienen temperaturas dentro del rango normal (21.3°C a 24.1°C), siendo la Sala B la más cálida con 24.1°C.</p>
+<h2>2. Estadísticas Detalladas</h2>
+<h3>Promedios por Ubicación:</h3>
+<ul>
+<li>Sala A: 22.5°C</li>
+<li>Sala B: 24.1°C</li>
+<li>Laboratorio: 19.8°C</li>
+<li>Almacén: 21.3°C</li>
+<li>Oficina Central: 23.0°C</li>
+</ul>
+<h3>Medidas de Dispersión:</h3>
+<ul>
+<li>Desviación Estándar: 1.56°C</li>
+<li>Rango: 4.3°C (19.8°C - 24.1°C)</li>
+</ul>
+<h3>Valores Extremos:</h3>
+<ul>
+<li><strong>Máximo</strong>: 24.1°C (Sala B, 2025-05-25 08:05)</li>
+<li><strong>Mínimo</strong>: 19.8°C (Laboratorio, 2025-05-25 08:10)</li>
+</ul>
+<h3>Percentiles:</h3>
+<ul>
+<li>25%: 21.3°C</li>
+<li>50% (Mediana): 22.5°C</li>
+<li>75%: 23.0°C</li>
+</ul>
+<h2>3. Alertas y Anomalías</h2>
+<p><strong>Alerta detectada</strong>:
+- Laboratorio (19.8°C) - Valor significativamente más bajo que el promedio y fuera del rango normal observado en otras ubicaciones.</p>
+<p><strong>Valores normales</strong>:
+- Todas las demás lecturas se encuentran dentro del rango esperado (21.3°C - 24.1°C)</p>
+<h2>4. Gráficas Interactivas</h2>
+<h3>Evolución Temporal de Temperaturas</h3>
+<pre class="codehilite"><code class="language-html"><div class=&quot;chart-container&quot; style=&quot;height:400px&quot;>
+    <canvas id=&quot;temperaturaLinea&quot;></canvas>
+</div>
+<script>
+const ctx = document.getElementById('temperaturaLinea').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['08:00', '08:05', '08:10', '08:15', '08:20'],
+        datasets: [{
+            label: 'Temperatura (°C)',
+            data: [22.5, 24.1, 19.8, 21.3, 23],
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            borderWidth: 3,
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Evolución Temporal de Temperaturas',
+                font: { size: 16 }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `${context.dataset.label}: ${context.raw}°C`;
+                    }
+                }
+            }
+        },
+        scales: {
+            y: {
+                title: {
+                    display: true,
+                    text: 'Temperatura (°C)'
+                }
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Hora de Lectura'
+                }
+            }
+        }
+    }
+});
+</script>
+</code></pre>
+
+<h3>Distribución por Ubicaciones</h3>
+<pre class="codehilite"><code class="language-html"><div class=&quot;chart-container&quot; style=&quot;height:400px&quot;>
+    <canvas id=&quot;temperaturaBarras&quot;></canvas>
+</div>
+<script>
+const ctx2 = document.getElementById('temperaturaBarras').getContext('2d');
+new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        labels: ['Sala A', 'Sala B', 'Laboratorio', 'Almacén', 'Oficina Central'],
+        datasets: [{
+            label: 'Temperatura (°C)',
+            data: [22.5, 24.1, 19.8, 21.3, 23],
+            backgroundColor: [
+                '#667eea',
+                '#764ba2',
+                '#e74c3c',
+                '#f39c12',
+                '#27ae60'
+            ],
+            borderColor: [
+                '#5568d4',
+                '#653a92',
+                '#d63c2c',
+                '#e38c02',
+                '#1d9e50'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Distribución de Temperaturas por Ubicación',
+                font: { size: 16 }
+            },
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                min: 18,
+                title: {
+                    display: true,
+                    text: 'Temperatura (°C)'
+                }
+            }
+        }
+    }
+});
+</script>
+</code></pre>
+
+<h3>Tendencia con Área</h3>
+<pre class="codehilite"><code class="language-html"><div class=&quot;chart-container&quot; style=&quot;height:400px&quot;>
+    <canvas id=&quot;temperaturaArea&quot;></canvas>
+</div>
+<script>
+const ctx3 = document.getElementById('temperaturaArea').getContext('2d');
+new Chart(ctx3, {
+    type: 'line',
+    data: {
+        labels: ['Sala A', 'Sala B', 'Laboratorio', 'Almacén', 'Oficina Central'],
+        datasets: [{
+            label: 'Temperatura (°C)',
+            data: [22.5, 24.1, 19.8, 21.3, 23],
+            backgroundColor: 'rgba(118, 75, 162, 0.2)',
+            borderColor: '#764ba2',
+            borderWidth: 3,
+            tension: 0.3,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Tendencia de Temperaturas por Ubicación',
+                font: { size: 16 }
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                min: 18,
+                title: {
+                    display: true,
+                    text: 'Temperatura (°C)'
+                }
+            }
+        }
+    }
+});
+</script>
+</code></pre>
+
+<h2>5. Conclusiones y Recomendaciones</h2>
+<p><strong>Conclusiones</strong>:
+1. Existe una variabilidad significativa en las temperaturas entre diferentes ubicaciones (rango de 4.3°C)
+2. El Laboratorio presenta una temperatura anormalmente baja (19.8°C) que activó el estado de alerta
+3. La Sala B es la ubicación más cálida con 24.1°C</p>
+<p><strong>Recomendaciones</strong>:
+1. Investigar la causa de la baja temperatura en el Laboratorio y ajustar el sistema de climatización
+2. Monitorear continuamente la Sala B para evitar que la temperatura aumente más allá de niveles cómodos
+3. Considerar establecer rangos óptimos específicos para cada ubicación según su uso
+4. Implementar un sistema de alertas tempranas para valores fuera de rango
+5. Realizar un análisis más extenso en el tiempo para identificar patrones de comportamiento</p>
+        </div>
+        <script>
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.font.size = 14;
+            Chart.defaults.color = '#2c3e50';
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const canvases = document.querySelectorAll('canvas');
+                canvases.forEach(canvas => {
+                    const container = canvas.parentElement;
+                    if (container) {
+                        canvas.style.maxWidth = '100%';
+                        canvas.style.height = 'auto';
+                    }
+                });
+            });
+        </script>
+    </body>
+    </html>
+    

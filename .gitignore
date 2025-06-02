@@ -46,3 +46,6 @@ Thumbs.db
 # ########################
 # Si generas archivos HTML, puedes ignorarlos (opcional)
 # *.html
+
+## 
+edgedriver_win64.zip

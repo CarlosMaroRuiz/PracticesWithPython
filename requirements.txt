@@ -1,3 +1,6 @@
 # Para la practica de excell
 openpyxl
 openai
+
+# para la practica de selenium
+selenium
