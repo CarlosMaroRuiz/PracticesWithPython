@@ -36,7 +36,7 @@ time.sleep(3)
 # Navegar al perfil
 browser.get("https://github.com/settings/profile")
 
-# Esperar a que cargue la página del perfil
+# Esperar a que cargue la pagina del perfil
 wait.until(EC.presence_of_element_located((By.ID, "user_profile_name")))
 
 # Extraer información del perfil
